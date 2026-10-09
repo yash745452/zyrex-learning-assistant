@@ -1,10 +1,83 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { TutorMessage } from '../../types';
 import { activeLLMProvider } from '../../services/aiProvider';
 import { Send, Bot, User, Sparkles, RefreshCw } from 'lucide-react';
+
+/**
+ * Minimal markdown-like renderer for tutor responses.
+ * Handles **bold**, `inline code`, ### headings, and ```code blocks```.
+ * No external dependencies.
+ */
+function renderFormattedText(text: string): React.ReactNode {
+  const lines = text.split('\n');
+  const result: React.ReactNode[] = [];
+  let inCodeBlock = false;
+  let codeBuffer: string[] = [];
+
+  const renderInline = (line: string, key: string): React.ReactNode => {
+    // Split on **bold** and `code` patterns
+    const parts = line.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+    return (
+      <span key={key}>
+        {parts.map((part, i) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={i} className="font-bold text-rich-black">{part.slice(2, -2)}</strong>;
+          }
+          if (part.startsWith('`') && part.endsWith('`')) {
+            return <code key={i} className="px-1.5 py-0.5 rounded bg-cream border border-beige-border font-mono text-[0.85em]">{part.slice(1, -1)}</code>;
+          }
+          return <span key={i}>{part}</span>;
+        })}
+      </span>
+    );
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (line.startsWith('```')) {
+      if (inCodeBlock) {
+        result.push(
+          <pre key={`code-${i}`} className="p-3 rounded-lg bg-near-black text-cream font-mono text-xs leading-relaxed overflow-x-auto my-2">
+            {codeBuffer.join('\n')}
+          </pre>
+        );
+        codeBuffer = [];
+        inCodeBlock = false;
+      } else {
+        inCodeBlock = true;
+      }
+      continue;
+    }
+
+    if (inCodeBlock) {
+      codeBuffer.push(line);
+      continue;
+    }
+
+    if (line.startsWith('### ')) {
+      result.push(<p key={i} className="font-bold text-rich-black text-sm mt-2 mb-1">{line.slice(4)}</p>);
+    } else if (line.trim() === '') {
+      result.push(<br key={i} />);
+    } else {
+      result.push(<p key={i} className="leading-relaxed">{renderInline(line, `l-${i}`)}</p>);
+    }
+  }
+
+  // Close any unclosed code block
+  if (inCodeBlock && codeBuffer.length > 0) {
+    result.push(
+      <pre key="code-final" className="p-3 rounded-lg bg-near-black text-cream font-mono text-xs leading-relaxed overflow-x-auto my-2">
+        {codeBuffer.join('\n')}
+      </pre>
+    );
+  }
+
+  return <>{result}</>;
+}
 
 export const TutorView: React.FC = () => {
   const [messages, setMessages] = useState<TutorMessage[]>([
@@ -18,6 +91,7 @@ export const TutorView: React.FC = () => {
   ]);
   const [inputVal, setInputVal] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const quickTopics = [
     'Paging vs Segmentation in OS',
@@ -25,6 +99,11 @@ export const TutorView: React.FC = () => {
     'ACID Properties in Transactions',
     'Karnaugh Map Minimization (Digital Logic)',
   ];
+
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleSend = async (textToSend: string) => {
     if (!textToSend.trim() || isTyping) return;
@@ -127,7 +206,7 @@ export const TutorView: React.FC = () => {
                   key={topic}
                   onClick={() => handleSend(topic)}
                   disabled={isTyping}
-                  className="w-full text-left text-xs p-2 rounded-lg border border-beige-border bg-canvas hover:bg-cream-pale transition-colors text-rich-black/90 font-medium"
+                  className="w-full text-left text-xs p-2 rounded-lg border border-beige-border bg-canvas hover:bg-cream-pale transition-colors text-rich-black/90 font-medium disabled:opacity-50"
                 >
                   {topic}
                 </button>
@@ -164,7 +243,12 @@ export const TutorView: React.FC = () => {
                     <span>{msg.sender === 'student' ? 'Student' : 'MindPilot Tutor'}</span>
                     <span>{msg.timestamp}</span>
                   </div>
-                  <div className="whitespace-pre-wrap">{msg.content}</div>
+                  <div>
+                    {msg.sender === 'tutor'
+                      ? renderFormattedText(msg.content)
+                      : <span className="whitespace-pre-wrap">{msg.content}</span>
+                    }
+                  </div>
                 </div>
 
                 {msg.sender === 'student' && (
@@ -181,6 +265,7 @@ export const TutorView: React.FC = () => {
                 <span>Deriving technical explanation...</span>
               </div>
             )}
+            <div ref={chatEndRef} />
           </div>
 
           {/* Chat Input Bar */}

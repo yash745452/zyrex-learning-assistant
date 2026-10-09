@@ -4,16 +4,16 @@
 **Team:** Zyrex  
 **Repository:** zyrex-learning-assistant  
 **Status Standard:** `DONE` | `IN PROGRESS` | `NEXT` | `UNKNOWN` | `BLOCKED`  
-**Last Updated:** 2026-10-09 17:20 IST  
+**Last Updated:** 2026-10-09 21:13 IST
 
 ---
 
 ## Task Overview & Progress Summary
 - **Total Tasks Tracked:** 25
-- **Completed (`DONE`):** 8
+- **Completed (`DONE`):** 10
 - **In Progress (`IN PROGRESS`):** 0
 - **Next (`NEXT`):** 1
-- **Planned / Pending Evaluation:** 16
+- **Planned / Pending Evaluation:** 14
 
 ---
 
@@ -43,8 +43,8 @@
 
 | ID | Task | Priority | Acceptance Criteria | Verification Method | Status |
 |---|---|---|---|---|---|
-| **TASK-201** | Shell Layout & Multi-View Navigation | P1 | Desktop sidebar + mobile header supporting active view switches (Landing, Tutor, Roadmaps, Quizzes, Study Materials). | Navigation state transitions and responsive check. | `NEXT` |
-| **TASK-202** | Reusable UI Kit Components | P1 | Implement Buttons, Input fields, Badges, Tabs, Cards with all states (idle, hover, active, focus, disabled, loading). | Interaction testing across all component variants. | `UNKNOWN` |
+| **TASK-201** | Shell Layout & Multi-View Navigation | P1 | Desktop pill-nav with active state highlighting + mobile hamburger menu with animated slide-out panel. View transitions with fade-in-up animation. Keyboard accessible (Escape to close, aria-labels, aria-current). Body scroll lock when mobile menu is open. | `npm run build` zero errors. Mobile hamburger visible below `md` breakpoint, desktop pill nav above. | `DONE` |
+| **TASK-202** | Reusable UI Kit Components | P1 | Implement Buttons, Input fields, Badges, Tabs, Cards with all states (idle, hover, active, focus, disabled, loading). | Interaction testing across all component variants. | `NEXT` |
 | **TASK-203** | Design Assets Ingestion / Frame Review | P1 | Review official 15 design frames once supplied into repository. | Design artifact inspection. | `UNKNOWN` |
 
 ---
@@ -63,7 +63,7 @@
 
 | ID | Task | Priority | Acceptance Criteria | Verification Method | Status |
 |---|---|---|---|---|---|
-| **TASK-401** | AI Technical Tutor Chat View | P0 | Conversational interface with markdown rendering, syntax-highlighted code blocks, and conversation session persistence. | Interactive chat test with multiple technical queries. | `IN PROGRESS` |
+| **TASK-401** | AI Technical Tutor Chat View | P0 | Conversational interface with inline markdown rendering (**bold**, `code`, ### headings, ```code blocks```), auto-scroll on new messages, streaming response display with typing indicator. | Interactive chat test with multiple technical queries. `npm run build` zero errors. | `DONE` |
 | **TASK-402** | Local Document Ingestion & Reader | P1 | Ingest PDF/TXT files locally, extract text chunks, and ground tutor answers with section references. | Upload sample lecture PDF and verify grounded Q&A. | `UNKNOWN` |
 | **TASK-403** | Personalized Roadmap Generator | P1 | Generate structured semester/exam prep roadmaps with modules, milestones, and status toggles. | Generate roadmap for "Operating Systems", mark modules done. | `UNKNOWN` |
 | **TASK-404** | Practice & Quiz Generator Module | P1 | Generate adaptive multiple-choice and conceptual questions with instant feedback and score recording. | Complete a 5-question quiz, verify score and explanation UI. | `UNKNOWN` |

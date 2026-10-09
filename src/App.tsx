@@ -24,21 +24,23 @@ export const App: React.FC = () => {
       {/* Persistent Navigation Shell */}
       <Navbar activeView={activeView} onNavigate={handleNavigate} />
 
-      {/* Main View Router */}
+      {/* Main View Router — key forces re-mount for fade-in animation */}
       <main className="flex-1">
-        {activeView === 'landing' && (
-          <>
-            <HeroSection onNavigate={handleNavigate} />
-            <PillarsSection onNavigate={handleNavigate} />
-            <InteractiveTutorPreview />
-            <RoadmapPreview onNavigate={handleNavigate} />
-          </>
-        )}
+        <div key={activeView} className="animate-fade-in-up">
+          {activeView === 'landing' && (
+            <>
+              <HeroSection onNavigate={handleNavigate} />
+              <PillarsSection onNavigate={handleNavigate} />
+              <InteractiveTutorPreview />
+              <RoadmapPreview onNavigate={handleNavigate} />
+            </>
+          )}
 
-        {activeView === 'tutor' && <TutorView />}
-        {activeView === 'roadmaps' && <RoadmapsView />}
-        {activeView === 'materials' && <MaterialsView />}
-        {activeView === 'quizzes' && <QuizzesView />}
+          {activeView === 'tutor' && <TutorView />}
+          {activeView === 'roadmaps' && <RoadmapsView />}
+          {activeView === 'materials' && <MaterialsView />}
+          {activeView === 'quizzes' && <QuizzesView />}
+        </div>
       </main>
 
       {/* Persistent Footer */}
